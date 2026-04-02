@@ -1,0 +1,41 @@
+services:
+  # 1. Cơ sở dữ liệu MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: task_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  # 2. Bộ nhớ đệm Redis
+  redis:
+    image: redis:latest
+    container_name: task_redis
+    ports:
+      - "6379:6379"
+
+  # 3. Server API chính (Chạy file main.py)
+  api:
+    build: .
+    container_name: task_api
+    # Lệnh khởi chạy server, mở cổng ra toàn mạng (0.0.0.0)
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - redis
+
+  # 4. Background Worker (Chạy ngầm file worker.py)
+  worker:
+    build: .
+    container_name: task_worker
+    # Lệnh chạy luồng background
+    command: python worker.py
+    depends_on:
+      - mongodb
+      - redis
+
+volumes:
+  mongodb_data:
