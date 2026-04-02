@@ -21,7 +21,7 @@ async def main():
     await pubsub.subscribe("task_events")
     print("Background Worker đang chạy và lắng nghe sự kiện từ Redis...")
 
-    # 3. Vòng lặp vô tận (như vòng lặp while(1) trong vi điều khiển)
+    # 3. Vòng lặp vô tận dể lắng nghe sự kiện
     async for message in pubsub.listen():
         if message["type"] == "message":
             # Khi có tín hiệu bắn tới, lấy dữ liệu ra
